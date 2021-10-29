@@ -10,34 +10,55 @@ from kivy.properties import BooleanProperty, NumericProperty
 from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.label import Label
 from kivy.uix.pagelayout import PageLayout
-from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 
 
-class AlarmsGeneralLayout(PageLayout):
-    "PageLayout for the scheduled alarms and for the set alarm pages."
-
-
-class InputLayout(FloatLayout):
-    """FloatLayout for placing the text-input box used for setting an alarm."""
-
-
-class ScreenMng(ScreenManager):
-    """The root widget of the application. Used for mananing the screens."""
+class ClockLayout(FloatLayout):
+    """FloatLayout for displaying the clock."""
 
 
 class ClockTimeBgLayout(FloatLayout):
     """FloatLayout for the first screen, where there are the clock and the time."""
 
 
-class TimeLayout(FloatLayout):
-    "FloatLayout for displaying the time."
+class InputLayout(FloatLayout):
+    """FloatLayout for placing the text-input box used for setting an alarm."""
+
+
+class NoAlarmLabel(Label):
+    """Label displayed when there is no alarm set."""
+    pass
 
 
 class SetAlarmLayout(FloatLayout):
     """FloatLayout for displaying the page where the alarms are set."""
+
+
+class TimeLayout(FloatLayout):
+    "FloatLayout for displaying the time."
+
+
+class TimeWid(Widget):
+    """The time display widget."""
+
+
+class GeneralLayout(PageLayout):
+    "PageLayout for the scheduled alarms and for the set alarm pages."
+    time = ObjectProperty(datetime.now())
+
+    def __init__(self, **kwargs):
+        Clock.schedule_interval(
+            self.update_time, 1
+        )
+        super().__init__(**kwargs)
+
+    def update_time(self, dt):
+
+        self.time = self.time + timedelta(seconds=1)
+        return True
 
 
 class Alarm(Widget):
@@ -57,16 +78,23 @@ class Alarm(Widget):
         self.sound.loop = True
         super().__init__(**kwargs)
 
+    def to_datetime(self, value):
+        time = self.parent.parent.time
+        x = datetime.strptime(value, r'%H:%M:%S')
+        x = datetime(time.year, time.month, time.day, x.hour, x.minute, x.second)
+        return x
+
     def time_check(self, dt):
         """Check whether the alarm time is equal to the current time"""
-        if self.parent.time == self.alarm_time:
+        alarm_time_dt = self.to_datetime(self.alarm_time)
+        if (self.parent.parent.time >= alarm_time_dt) and (
+            not self.playing):
             self.playing = True
             self.sound.play()
             Clock.schedule_once(
                 self.remove, 60
             )
             
-
     def remove(self, *args):
         """Cancel and remove the alarm from the list of set alarms."""
         self.check.cancel()
@@ -172,37 +200,21 @@ class AlarmInput(TextInput):
 class AlarmsLayout(BoxLayout):
     """BoxLayout for displaying all the set alarms. Each alarm created
     will stack on top of each other."""
-    time = StringProperty()
+    label = ObjectProperty()
 
     def __init__(self, **kwargs):
-        Clock.schedule_interval(self.get_current_time, 1)
+        Clock.schedule_interval(self.check_if_alarms, 0.05)
         super().__init__(**kwargs)
 
-    def get_current_time(self, dt):
-        self.time = datetime.now().strftime(r'%H:%M:%S')
-        return True
+    def check_if_alarms(self, dt):
 
-
-class ClockLayout(FloatLayout):
-    """FloatLayout for displaying the clock."""
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
-class TimeWid(Widget):
-    """The time display widget."""
-    time = StringProperty()
-
-    def __init__(self, **kwargs):
-        self.time = datetime.now().strftime('%H:%M:%S')
-        Clock.schedule_interval(self.update_time, 1)
-        super().__init__(**kwargs)
-
-    def update_time(self, dt):
-        """Update the clock tick by tick."""
-        self.time = datetime.now().strftime('%H:%M:%S')
-
+        if not self.label and not self.children:
+            self.label = NoAlarmLabel()
+            self.add_widget(self.label)
+        elif self.label and len(self.children) > 1:
+            self.remove_widget(self.label)
+            self.label = ''
+                
 
 class ClockWid(Widget):
     """The clock widget."""
@@ -211,24 +223,12 @@ class ClockWid(Widget):
     s_degrees = NumericProperty()
 
     def __init__(self, **kwargs):
-        self.h_degrees = ClockWid.angle('hour')
-        self.m_degrees = ClockWid.angle('minute')
-        self.s_degrees = ClockWid.angle('second')
         self.clock = Clock.schedule_interval(self.set_degrees, 1)
         super().__init__(**kwargs)
-
-
-    def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
-            self.parent.parent.parent.parent.current = 'alarms_screen'
-            return True
-        return super().on_touch_down(touch)
-
         
-    @staticmethod
-    def angle(pointer: str):
+    def angle(self, pointer: str):
         """Calculate the degrees of the clock pointers (hours, minutes and seconds)."""
-        now = datetime.now()
+        now = self.parent.parent.parent.time
         if pointer == 'hour':
             segs = (now.hour%12)*60*60 + now.minute*60 + now.second
             return math.radians((360/(12*60*60))*segs)
@@ -238,19 +238,18 @@ class ClockWid(Widget):
         elif pointer == 'second':
             return math.radians((360/60)*now.second)
 
-
     def set_degrees(self, dt):
         """Set the clock's degrees properties."""
-        self.h_degrees = ClockWid.angle('hour')
-        self.m_degrees = ClockWid.angle('minute')
-        self.s_degrees = ClockWid.angle('second')
+        self.h_degrees = self.angle('hour')
+        self.m_degrees = self.angle('minute')
+        self.s_degrees = self.angle('second')
         return True
 
 
 class AlarmClockApp(App):
     """The main application."""
     def build(self):
-        return ScreenMng()
+        return GeneralLayout()
 
 
 if __name__ == '__main__':
