@@ -113,7 +113,7 @@
     pos_hint: {'center_x':0.5, 'center_y':0.5}
     canvas:
         Color: 
-            rgb: bg_color
+            rgb: bg_color if not root.playing else (1, 1, 0, 1)
         Rectangle:
             size: self.size
             pos: self.pos

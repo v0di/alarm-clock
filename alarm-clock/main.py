@@ -1,10 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import math
+import os
 import re
 
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.properties import NumericProperty, StringProperty
+from kivy.core.audio import SoundLoader
+from kivy.properties import BooleanProperty, NumericProperty
+from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.pagelayout import PageLayout
@@ -42,19 +45,32 @@ class Alarm(Widget):
     It has a label displaying the time set and a button to cancel it.
     """
     alarm_time = StringProperty()
+    sound = ObjectProperty(
+        SoundLoader.load(
+            os.path.join('alarm-sounds', 'sound1.wav'),
+        )
+    )
+    playing = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         self.check = Clock.schedule_interval(self.time_check, 1)
+        self.sound.loop = True
         super().__init__(**kwargs)
 
     def time_check(self, dt):
         """Check whether the alarm time is equal to the current time"""
         if self.parent.time == self.alarm_time:
-            self.remove()
+            self.playing = True
+            self.sound.play()
+            Clock.schedule_once(
+                self.remove, 60
+            )
+            
 
-    def remove(self):
+    def remove(self, *args):
         """Cancel and remove the alarm from the list of set alarms."""
         self.check.cancel()
+        self.sound.stop()
         self.parent.remove_widget(self)
 
 
@@ -98,7 +114,9 @@ class AlarmInput(TextInput):
                 alarms_lay = self.parent.parent.parent.children[1]
                 try:
                     if len(alarms_lay.children) < 5:
-                        alarms_lay.add_widget(Alarm(alarm_time=self.text))
+                        alarms_lay.add_widget(
+                            Alarm(alarm_time=self.text)
+                        )
                 except IndexError:
                     alarms_lay.add_widget(Alarm(alarm_time=self.text))
                 self.clear_text()
