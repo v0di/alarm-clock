@@ -97,8 +97,9 @@ class Alarm(Widget):
             
     def remove(self, *args):
         """Cancel and remove the alarm from the list of set alarms."""
+        if self.playing:
+            self.sound.stop()
         self.check.cancel()
-        self.sound.stop()
         self.parent.remove_widget(self)
 
 
