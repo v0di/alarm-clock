@@ -30,7 +30,6 @@ class InputLayout(FloatLayout):
 
 class NoAlarmLabel(Label):
     """Label displayed when there is no alarm set."""
-    pass
 
 
 class SetAlarmLayout(FloatLayout):
@@ -56,7 +55,7 @@ class GeneralLayout(PageLayout):
         super().__init__(**kwargs)
 
     def update_time(self, dt):
-
+        """Update the time every second."""
         self.time = self.time + timedelta(seconds=1)
         return True
 
@@ -79,6 +78,7 @@ class Alarm(Widget):
         super().__init__(**kwargs)
 
     def to_datetime(self, value):
+        """Convert H:M:S string time-format to datetime object."""
         time = self.parent.parent.time
         x = datetime.strptime(value, r'%H:%M:%S')
         x = datetime(time.year, time.month, time.day, x.hour, x.minute, x.second)
@@ -208,7 +208,8 @@ class AlarmsLayout(BoxLayout):
         super().__init__(**kwargs)
 
     def check_if_alarms(self, dt):
-
+        """Check whether there is at least one alarm set. If there is
+        none, add a label saying 'NO ALARMS'."""
         if not self.label and not self.children:
             self.label = NoAlarmLabel()
             self.add_widget(self.label)
