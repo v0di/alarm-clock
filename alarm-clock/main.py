@@ -56,7 +56,7 @@ class GeneralLayout(PageLayout):
 
     def update_time(self, dt):
         """Update the time every second."""
-        self.time = self.time + timedelta(seconds=1)
+        self.time = datetime.now()
         return True
 
 
@@ -87,14 +87,15 @@ class Alarm(Widget):
     def time_check(self, dt):
         """Check whether the alarm time is equal to the current time"""
         alarm_time_dt = self.to_datetime(self.alarm_time)
-        if (self.parent.parent.time >= alarm_time_dt) and (
-            not self.playing):
+        if (alarm_time_dt - timedelta(seconds=1) <= 
+        self.parent.parent.time <= alarm_time_dt + 
+        timedelta(seconds=1)) and not self.playing:
             self.playing = True
             self.sound.play()
             Clock.schedule_once(
                 self.remove, 60
             )
-            
+
     def remove(self, *args):
         """Cancel and remove the alarm from the list of set alarms."""
         if self.playing:
@@ -142,7 +143,7 @@ class AlarmInput(TextInput):
             if keycode[1] == 'enter':
                 alarms_lay = self.parent.parent.parent.children[1]
                 try:
-                    if len(alarms_lay.children) < 5:
+                    if len(alarms_lay.children) < 8:
                         alarms_lay.add_widget(
                             Alarm(alarm_time=self.text)
                         )
@@ -216,7 +217,7 @@ class AlarmsLayout(BoxLayout):
         elif self.label and len(self.children) > 1:
             self.remove_widget(self.label)
             self.label = ''
-                
+
 
 class ClockWid(Widget):
     """The clock widget."""

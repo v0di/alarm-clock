@@ -62,19 +62,19 @@
                         pos: self.center_x - min(self.size)/2, self.center_y - min(self.size)/2 
                         size: (m := min(self.size)), m
                     Color:
-                        rgb: pointer_color
-                    Line:
-                        points: [[self.center_x, self.center_y], [self.center_x + math.sin(self.s_degrees)*min(self.size)/4, self.center_y + math.cos(self.s_degrees)*min(self.size)/4]]
-                        width: 4
+                        rgb: input_text_color
+                    Line:  # seconds pointer
+                        points: [[self.center_x, self.center_y], [self.center_x + math.sin(self.s_degrees)*min(self.size)/2.2, self.center_y + math.cos(self.s_degrees)*min(self.size)/2.2]]
+                        width: 3
                     Color:
                         rgb: pointer_color
-                    Line:
-                        points: [[self.center_x, self.center_y], [self.center_x + math.sin(self.h_degrees)*min(self.size)/3, self.center_y + math.cos(self.h_degrees)*min(self.size)/3]]
+                    Line:  # hour pointer
+                        points: [[self.center_x, self.center_y], [self.center_x + math.sin(self.h_degrees)*min(self.size)/4, self.center_y + math.cos(self.h_degrees)*min(self.size)/4]]
                         width: 5
                     Color:
                         rgb: pointer_color
-                    Line:
-                        points: [[self.center_x, self.center_y], [self.center_x + math.sin(self.m_degrees)*min(self.size)/2, self.center_y + math.cos(self.m_degrees)*min(self.size)/2.5]]
+                    Line:  # minutes pointer
+                        points: [[self.center_x, self.center_y], [self.center_x + math.sin(self.m_degrees)*min(self.size)/2.5, self.center_y + math.cos(self.m_degrees)*min(self.size)/2.5]]
                         width: 5
     AlarmsLayout:
         id: alarms_layout
@@ -102,6 +102,7 @@
                 multiline: False
                 foreground_color: input_text_color
                 cursor_blink: False
+                hint_text: 'SET ALARM'
                 pos_hint: {'center_x':0.5, 'center_y':0.5}
                 background_color: input_color
                 font_size: sp(set_alarm_layout.width/12)

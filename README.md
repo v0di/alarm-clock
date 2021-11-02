@@ -3,9 +3,7 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/v0di/alarm-clock)
 # Alarm-Clock made with Python and Kivy.
 <h4>A simple alarm-clock created using Python and Kivy.</h4>
-See the time. Set a maximum of 5 alarms. Cancel alarms.
-
-# Note: project not finished yet!
+See the time. Set a maximum of 8 alarms. Cancel alarms.
 <div></div>
 <img src="examples/example_gif.gif">
 
@@ -15,5 +13,5 @@ See the time. Set a maximum of 5 alarms. Cancel alarms.
 # See all the alarms you have set. You can also cancel any of them.
 <img src="examples/example_alarms.jpg">
 
-# Set a maximum of 5 alarms.
+# Set a maximum of 8 alarms.
 <img src="examples/example_set_alarm.jpg">
