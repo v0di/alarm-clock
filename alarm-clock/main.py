@@ -65,12 +65,12 @@ class Alarm(Widget):
     It has a label displaying the time set and a button to cancel it.
     """
     alarm_time = StringProperty()
+    playing = BooleanProperty(False)
     sound = ObjectProperty(
         SoundLoader.load(
             os.path.join('alarm-sounds', 'sound1.wav'),
         )
     )
-    playing = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         self.check = Clock.schedule_interval(self.time_check, 1)
@@ -85,7 +85,7 @@ class Alarm(Widget):
         return x
 
     def time_check(self, dt):
-        """Check whether the alarm time is equal to the current time"""
+        """Check whether the alarm time is equal to the current time."""
         alarm_time_dt = self.to_datetime(self.alarm_time)
         if (alarm_time_dt - timedelta(seconds=1) <= 
         self.parent.parent.time <= alarm_time_dt + 
@@ -163,7 +163,6 @@ class AlarmInput(TextInput):
                 )
             )
             return True
-
         for c in keycode[1]:  # Checks whether the pressed key is a number key.
             if c.isdigit():
                 return super().keyboard_on_key_down(window, keycode, text, modifiers)
@@ -181,7 +180,6 @@ class AlarmInput(TextInput):
                 return True    
             self.clear_text()
             return True
-
         elif length == 5:
             mins = self.text[-2:]
             if self.m_patt.match(mins):
@@ -190,7 +188,6 @@ class AlarmInput(TextInput):
                 return True
             self.clear_text()
             return True
-
         elif length == 8:
             secs = self.text[-2:]
             if self.m_patt.match(secs):

@@ -68,7 +68,7 @@
                         width: 3
                     Color:
                         rgb: pointer_color
-                    Line:  # hour pointer
+                    Line:  # hours pointer
                         points: [[self.center_x, self.center_y], [self.center_x + math.sin(self.h_degrees)*min(self.size)/4, self.center_y + math.cos(self.h_degrees)*min(self.size)/4]]
                         width: 5
                     Color:
@@ -76,6 +76,7 @@
                     Line:  # minutes pointer
                         points: [[self.center_x, self.center_y], [self.center_x + math.sin(self.m_degrees)*min(self.size)/2.5, self.center_y + math.cos(self.m_degrees)*min(self.size)/2.5]]
                         width: 5
+                        
     AlarmsLayout:
         id: alarms_layout
         orientation: 'vertical'
